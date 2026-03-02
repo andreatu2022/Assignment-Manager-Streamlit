@@ -1,7 +1,15 @@
+#For Homework: he will grade on personal layout design (do not put things in order, focus on bolding, font size, etc)
+
 import streamlit as st
 import time
 import json
 from pathlib import Path 
+
+st.set_page_config(page_title="Course Management", 
+                   page_icon="",
+                   layout="centered",
+                   initial_sidebar_state="collapsed"
+                   )
 
 st.title("Course Management App")
 st.divider()
@@ -39,9 +47,30 @@ with tab1:
     tab_option = st.radio("View/Search", ["View", "Search"], horizontal=True)
     if tab_option == "View":
         st.dataframe(assignments)
+    else:
+        titles = []
+        for assignment in assignments:
+            titles.append(assignment["title"])
+        
+        #Input
+        selected_title = st.selectbox("Select a title", titles,key="selected_title")
 
+        selected_assignment = {}
+
+        #Process
+        for assignment in assignments:
+            if assignment["title"] == selected_title:
+                selected_assignment = assignment
+                break
+        
+        #Output
+        if not selected_assignment:
+            with st.expander("Assignment Details", expanded=True):
+                st.markdown(f"### Title: {selected_assignment["title"]}")
+                st.markdown(f"**Description**: {selected_assignment["description"]}")
+                st.markdown(f"Type: **{selected_assignment["type"]}**")
+        
 with tab2:
-    st.info("Coming soon...")
     st.markdown("## Add New Assignment")
     #st.markdown("### Add New Assignment")
 
@@ -82,7 +111,8 @@ with tab2:
                     }
                 )
                 
-                #record into json file
+                #record into json file: need to know the name of the file/path (in line 37)
+                #anytime you make changes to the json file, you need to record the changes to the json file
                 with json_path.open("w", encoding="utf-8") as f:
                     json.dump(assignments, f)
 
@@ -91,5 +121,34 @@ with tab2:
                 st.dataframe(assignments) 
 
 with tab3:
-    st.info("Maybe coming soon...")
+    st.markdown("## Update An Assignment")
+    titles = []
+
+    for assignment in assignments:
+        titles.append(assignment["title"])
+
+    #In everyone of this st.elements where you are collecting input, you need a unique key everytime!
+    selected_item = st.selectbox("Select a title", titles, key="selected_title_edit")
+
+    assignment_edit = {}
+    for assignment in assignments:
+        if assignment['title'] == selected_item:
+            assignment_edit = assignment
+            break
+    
+    if assignment_edit:
+        edit_title = st.text_input("Title", key="edit_title", value=assignment_edit['title'])
+        edit_description = st.text_area("Description", key="edit_description", value=assignment_edit['description'])
+
+    btn_update = st.button("Update", key="update_button", type="secondary", use_container_width=True)
+    if btn_update:
+        with st.spinner("Updating..."):
+            time.sleep(5)
+            assignment_edit['title'] = edit_title
+            assignment_edit['description'] = edit_description
+
+            with json.path("w", encoding="utf-8") as f:
+                json.dump(assignments,f)
+            
+            st.success("Updated...")
 
