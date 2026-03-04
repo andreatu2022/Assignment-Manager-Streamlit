@@ -63,12 +63,15 @@ with tab1:
                 selected_assignment = assignment
                 break
         
+        st.divider()
+        selected_assignment = st.selectbox("Select Title", options=assignments, format_func=lambda x: f"{x['title']}")
+
         #Output
         if not selected_assignment:
             with st.expander("Assignment Details", expanded=True):
-                st.markdown(f"### Title: {selected_assignment["title"]}")
-                st.markdown(f"**Description**: {selected_assignment["description"]}")
-                st.markdown(f"Type: **{selected_assignment["type"]}**")
+                st.markdown(f"### Title: {selected_assignment['title']}")
+                st.markdown(f"**Description**: {selected_assignment['description']}")
+                st.markdown(f"Type: **{selected_assignment['type']}**")
         
 with tab2:
     st.markdown("## Add New Assignment")
@@ -137,8 +140,13 @@ with tab3:
             break
     
     if assignment_edit:
-        edit_title = st.text_input("Title", key="edit_title", value=assignment_edit['title'])
-        edit_description = st.text_area("Description", key="edit_description", value=assignment_edit['description'])
+        edit_title = st.text_input("Title", key=f"edit_title_{assignment_edit['id']}", value=assignment_edit['title'])
+        edit_description = st.text_area("Description", key=f"edit_description_{assignment_edit['id']}", value=assignment_edit['description'])
+
+        type_options = ["Homework", "Lab"]
+        selected_index = type_options.index(assignment_edit['type'])
+
+        edit_type = st.radio("Type", ["Homework", "Lab"], key = f'edit_type_{assignment_edit['id']}')
 
     btn_update = st.button("Update", key="update_button", type="secondary", use_container_width=True)
     if btn_update:
@@ -150,5 +158,9 @@ with tab3:
             with json.path("w", encoding="utf-8") as f:
                 json.dump(assignments,f)
             
-            st.success("Updated...")
+            st.success("Assignment is updated!")
+            time.sleep(5)
+            st.rerun()
 
+with st.sidebar:
+    st.markdown("Sidebar")
