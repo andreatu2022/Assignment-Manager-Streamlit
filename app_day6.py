@@ -31,8 +31,53 @@ users = [
     }
 ]
 
-if st.session_state["role"] == "instructor":
-    st.markdown("Welcome! This is the Instructor Dashboard")
+json_path = Path("users.json")
+if json_path.exists():
+    with open(json.path, "r") as f:
+        users = json.load
+
+
+assignments = [
+    {
+        "id":"HW1",
+        "title":"Intro to Database",
+        "description":"Basics of Database Design",
+        "points":100,
+        "type":"Homework"
+    },
+    {
+        "id":"HW2",
+        "title":"Normalization",
+        "description":"Normalizing",
+        "points":100,
+        "type":"Homework"
+    }
+]
+
+json_path = Path("assignments.json")
+#Load the data from a json file
+if json_path.exists():
+    with json_path.open("r", encoding="utf-8") as f:
+        assignments = json.load(f)
+
+
+json_path = Path("users.json")
+if json_path.exists():
+    with open(json.path, "r") as f:
+        users = json.load
+
+
+if st.session_state["role"] == "Instructor":
+    if st.session_state["page"] == "home":
+        st.markdown("Welcome! This is the Instructor Dashboard")
+        if st.button("Go To Dashboard", key="dashboard_view_btn", type="primary", use_container_width=True):
+            st.session_state["page"] = "dashboard"
+            st.rerun()
+    elif st.session_state["page"] == "dashboard":
+        st.markdown("Dashboard")
+
+    
+
 
 elif st.session_state["role"] == "Admin":
     st.markdown("Welcome! This is the Admin Dashboard")
@@ -47,9 +92,6 @@ elif st.session_state["role"] == "Admin":
 
             #After every important action, you need to rerun the page!
             st.rerun()
-
-
-
 
 else:
     # --- LOGIN ---
@@ -74,6 +116,7 @@ else:
                     st.session_state["logged_in"] = True
                     st.session_state["user"] = found_user
                     st.session_state["role"] = found_user["role"]
+                    st.session_state["page"] = "home"
 
                     st.sucess("Login sucessful!")
                     time.sleep(2)
@@ -97,6 +140,9 @@ else:
                     "password": new_password,
                     "role": "Instructor"
                 })
+
+                with open(json_path, "w") as f:
+                    json.dump(users, f)
 
                 st.success("Account created!")
                 st.rerun()
