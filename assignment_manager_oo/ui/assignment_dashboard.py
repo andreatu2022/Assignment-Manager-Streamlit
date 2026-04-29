@@ -15,7 +15,38 @@ class AssignmentDashboard:
             self.show_add_new_assignment()
     
     def show_manage_assignments(self):
-        pass
+        col1, col2 = st.columns([3,1])
+        with col1:
+            st.subheader("Assignments")
+        with col2:
+            if st.button("Add New Assignment", key="new_assignment_btn", type = "primary", use_container_width=True):
+                st.session_state['page'] = "add new assignment"
+                st.rerun()
+        
+        assignments = self.manager.all()
+        for assignment in assignments:
+            with st.container(border=True):
+                st.markdown(f"### Title: {assignment['title']}")
+                with st.button("Edit", key=f"edit_assignment_{assignment['id']}", type="secondary", use_container_width=True):
+                    pass
+
+            st.divider()
+
 
     def show_add_new_assignment(self):
-        pass
+        st.subheader("Add New Assignment")
+        title = st.text_input("Title", key="title_txt")
+        description = st.text_area("Description", key="description_text")
+        if st.button("Save", key="save_btn", type="primary", use_container_width=True):
+            import time
+            time.sleep(2)
+            if not title:
+                st.warning("Title is missing")
+            else:
+                new_assignment = self.manager.add(title,description,100,"Homework")
+                self.store.save(self.manager.all())
+
+                st.success(f"Assignment is recorded. The new assignment id is {new_assignment['id']}")
+                time.sleep(3)
+                st.session_state['page'] = "dashboard"
+                st.rerun()

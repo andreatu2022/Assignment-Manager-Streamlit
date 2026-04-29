@@ -21,12 +21,11 @@ if "page" not in st.session_state:
 
 if st.session_state["logged_in"]:
     if st.session_state["role"] == "Instructor":
-        if st.session_state["page"] == "dashboard":
-            store = AssignmentStore(Path("assignment_manager_oo/assignments.json"))
-            manager = AssignmentManager(store.load())
+        if st.session_state["page"]:
+            store = AssignmentStore(Path("assignment_manager_oo/assignments.json")) #creating an object from the assignmentstore class and setting the initial object state
+            manager = AssignmentManager(store.load()) #creating an object from the assignment manager class and setting the initial state of the object
             dashboard = AssignmentDashboard(manager, store)
-            dashboard.main()
-
+            dashboard.main() #call the orcestrator 
     elif st.session_state["role"] == "Student":
         pass
 else:
